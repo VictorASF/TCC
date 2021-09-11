@@ -19,8 +19,9 @@ file = f'{path}{name_file}.{type_file}'
 
 df = pd.read_csv(file, sep='\t', encoding='utf-16')
 
-df['Date'] = pd.to_datetime(df['Data'])
+df['Date'] = pd.to_datetime(df['Data'], format='%d/%m/%Y')
 df['Date'] = df['Date'].dt.strftime('%y-%m-%d')
+print(df['Date'])
 df['Close'] = df['Valor'].apply(Decimal)
 
 #print(df[['Date', 'Open']].to_string(index=False))
@@ -40,7 +41,7 @@ for num in range(df['Date'].size):
     else:
         openFii = df['Close'][num-1]
     closeFii = df['Close'][num]
-    cursor.execute('INSERT into readCSV.'+name_file+' (data, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
+    cursor.execute('INSERT into readCSV.'+name_file+' (dia, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
                                                                                                        openFii,
                                                                                                        closeFii))
     database.commit()

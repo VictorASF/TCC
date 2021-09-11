@@ -12,7 +12,7 @@ database = conn.connectionDB()
 #Variaveis que definem a localização do arquivo
 
 path = 'C:/Users/vfonseca/Downloads/'
-name_file = 'BTLG11'
+name_file = 'MXRF11'
 #name_file = 'Índice de Fundos de Investimentos Imobiliários (IFIX) - Histórico  InfoMoney'
 type_file = 'csv'
 
@@ -45,7 +45,7 @@ for num in range(df['Date'].size):
     else:
         openFii = Decimal(df['Close'][num-1])
     closeFii = Decimal(df['Close'][num])
-    cursor.execute('INSERT into readCSV.'+name_file+' (data, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
+    cursor.execute('INSERT into readCSV.'+name_file+' (dia, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
                                                                                                        openFii,
                                                                                                        closeFii))
     database.commit()

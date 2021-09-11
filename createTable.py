@@ -13,7 +13,7 @@ def criarTabela(nome):
     #Função que cria uma tabela caso a mesma não exista
     cursor.execute("CREATE TABLE IF NOT EXISTS "+ nome + """(
     id INT NOT NULL AUTO_INCREMENT,
-    data DATE NOT NULL,
+    dia DATE NOT NULL,
     abertura DECIMAL(10,2) NOT NULL,
     fechamento DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (id));""")

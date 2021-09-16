@@ -12,7 +12,7 @@ database = conn.connectionDB()
 #Variaveis que definem a localização do arquivo
 
 path = 'C:/Users/vfonseca/Downloads/'
-name_file = 'MXRF11'
+name_file = 'KNRI11'
 #name_file = 'Índice de Fundos de Investimentos Imobiliários (IFIX) - Histórico  InfoMoney'
 type_file = 'csv'
 
@@ -40,10 +40,7 @@ database.commit()
 #Função for que popula a tabela de forma sequencial, utilizando somente da Data, do Valor de fechamento e de abertura
 for num in range(df['Date'].size):
     dateFii = df['Date'][num]
-    if num == 0:
-        openFii = Decimal(df['Close'][num])
-    else:
-        openFii = Decimal(df['Close'][num-1])
+    openFii = Decimal(df['Open'][num])
     closeFii = Decimal(df['Close'][num])
     cursor.execute('INSERT into readCSV.'+name_file+' (dia, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
                                                                                                        openFii,

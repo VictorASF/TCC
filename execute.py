@@ -6,22 +6,25 @@ database = conn.connectionDB()
 
 cursor = database.cursor()
 
-cod_fii = 'MXRF11'
+cod_fii = 'HGLG11'
 
-dia_inicio = '2017-08-09'
+#TRATAR FUNDOS KNRI11, E HFOF11
+
+dia_inicio = '2017-01-01'
 
 dia_fim = '2021-08-09'
+
 
 #cursor.execute('SELECT count(fechamento) from '+cod_fii+' WHERE dia >="'+dia_inicio+'" and dia <="'+dia_fim+'";')
 #N = cursor.fetchone()
 #N = (N[0])
 
 #Select no banco para pegar os valores de abertura do fundo nos dias indicados
-cursor.execute('SELECT dia, abertura from '+cod_fii+' WHERE dia >="'+dia_inicio+'" and dia <="'+dia_fim+'";')
+cursor.execute('SELECT dia, fechamento from '+cod_fii+' WHERE dia >="'+dia_inicio+'" and dia <="'+dia_fim+'";')
 fii = cursor.fetchall()
 
 #Select no banco para pegar o valor de abertura do IFIX(benchmark) nos dias indicados
-cursor.execute('SELECT dia, abertura from IFIX WHERE dia >="'+dia_inicio+'" and dia <="'+dia_fim+'";')
+cursor.execute('SELECT dia, fechamento from IFIX WHERE dia >="'+dia_inicio+'" and dia <="'+dia_fim+'";')
 ifix= cursor.fetchall()
 
 cursor.execute('SELECT dia from IFIX WHERE dia >="'+dia_inicio+'" and dia <="'+dia_fim+'";')
@@ -57,32 +60,44 @@ vet_fii.reverse()
 vet_return_ifix = []
 vet_return_fii = []
 
-
 for i in range(len(dias)-1):
-    vet_return_ifix.append(1-(vet_ifix[i]/vet_ifix[i+1]))
+    if i+1 < len(dias):
+        vet_return_ifix.append(1 - (vet_ifix[i]/vet_ifix[i+1]))
 
 for i in range(len(dias) - 1):
-    vet_return_fii.append(1 - (vet_fii[i] / vet_fii[i + 1]))
+    if i + 1 < len(dias):
+        vet_return_fii.append(1 - (vet_fii[i] / vet_fii[i + 1]))
 
 media_return_fii = 0
 media_return_ifix = 0
 
 for x in vet_return_ifix:
     media_return_ifix += x
-media_return_ifix = media_return_ifix/(vet_return_ifix.__len__())
+media_return_ifix = media_return_ifix/(len(vet_return_ifix))
 
 for x in vet_return_fii:
     media_return_fii += x
-media_return_fii = media_return_fii/(vet_return_fii.__len__())
+media_return_fii = media_return_fii/(len(vet_return_fii))
 
-print(media_return_fii)
-print(media_return_ifix)
+print(f"Retorno media FII: {media_return_fii}")
+print(f"Retorno media IFIX: {media_return_ifix}")
 
 COV = 0
 VAR = 0
 
-for x in range(len(vet_return_ifix)):
+for x in range(len(vet_return_fii)):
     COV += ((vet_return_fii[x]-media_return_fii)*(vet_return_ifix[x]-media_return_ifix))
-COV = COV/(len(vet_return_ifix))
+COV = COV/(len(vet_return_fii))
 
-print(COV)
+print(f"Covariancia: {COV}")
+
+for x in range(len(vet_return_ifix)):
+    VAR += (vet_return_ifix[x]-media_return_ifix)**2
+VAR = VAR/(len(vet_return_ifix)-1)
+
+print(f"Variancia: {VAR}")
+
+Beta = COV/VAR
+Beta = float(Beta)
+
+print(f"Indice Beta: {Beta}")

@@ -12,8 +12,7 @@ database = conn.connectionDB()
 #Variaveis que definem a localização do arquivo
 
 path = 'C:/Users/vfonseca/Downloads/'
-name_file = 'KNRI11'
-#name_file = 'Índice de Fundos de Investimentos Imobiliários (IFIX) - Histórico  InfoMoney'
+name_file = 'BPFF11'
 type_file = 'csv'
 
 #Variavel que define o arquivo que será lido

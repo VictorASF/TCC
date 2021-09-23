@@ -4,7 +4,7 @@ database = Conn.connectionDB()
 
 cursor = database.cursor()
 
-cod_fii = 'BTLG11'
+cod_fii = 'BPFF11'
 
 # Opções de FII
 # BTLG11 Imovel Logistico
@@ -21,7 +21,7 @@ cod_fii = 'BTLG11'
 
 valor_investido = 10000
 
-dia_inicio = '2017-01-01'
+dia_inicio = '2021-01-01'
 
 dia_fim = '2021-09-06'
 

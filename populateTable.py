@@ -31,7 +31,7 @@ criarTabela(name_file)
 
 # Função que limpa a tabela caso a tabela já exista e tenha conteudo
 # Essa limpeza é mais utilizada quando ocorre atualizações nos registros
-cursor.execute('TRUNCATE '+name_file+';')
+cursor.execute('TRUNCATE readCSV.' + name_file + ';')
 database.commit()
 
 

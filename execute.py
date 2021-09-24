@@ -28,10 +28,10 @@ cod_fii = 'BTLG11'
 valor_investido = 10000
 
 # Variavel de dia inicial que vai determinar o inicio do periodo no banco de dados
-dia_inicio = '2019-01-01'
+dia_inicio = '2017-01-01'
 
 # Variavel do dia final que vai determinar o fim do periodo que deve ser buscado no banco
-dia_fim = '2020-01-01'
+dia_fim = '2021-09-06'
 #dia_fim = '2021-09-06'
 
 # Select no banco para selecionar os valores de abertura do fundo nos dias indicados
@@ -199,7 +199,7 @@ rendimentos = float((sumYield/100)*preco_medio)
 print(f'No ato da compra geraria {cotas} cotas que renderam cada cota {rendimentos:0.2f}')
 print(f'Ou R${cotas*rendimentos:0.2f} no total')
 
-
+"""
 matt.plot(list_return_dia, list_return_ifix)
 matt.plot(list_return_dia, list_return_fii, ':')
 matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
@@ -208,7 +208,7 @@ matt.ylabel('Retorno (%)')
 matt.legend(['IFIX', cod_fii])
 matt.grid()
 matt.show()
-
+"""
 
 x = nump.array(list_return_ifix)
 y = nump.array(list_return_fii)
@@ -224,5 +224,5 @@ matt.title(f'Beta {cod_fii} periodo {dia_inicio} a {dia_fim}')
 matt.xlabel('IFIX')
 matt.ylabel(cod_fii)
 matt.grid()
-# matt.show()
+matt.show()
 

@@ -36,15 +36,15 @@ dia_fim = '2021-09-06'
 
 # Select no banco para selecionar os valores de abertura do fundo nos dias indicados
 cursor.execute(
-    'SELECT dia, fechamento from readCSV.' + cod_fii + ' WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
+    'SELECT dia, fechamento from FUNDOS.' + cod_fii + ' WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
 fii = cursor.fetchall()
 
 # Select no banco para selecionar o valor de fechamento do IFIX(benchmark) nos dias indicados
-cursor.execute('SELECT dia, fechamento from readCSV.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
+cursor.execute('SELECT dia, fechamento from FUNDOS.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
 ifix = cursor.fetchall()
 
 # Select no banco para selecionar os dias que a bolsa funcionou
-cursor.execute('SELECT dia from readCSV.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
+cursor.execute('SELECT dia from FUNDOS.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
 dias = cursor.fetchall()
 
 # Select no banco para selecionar a quantidade de dias que a bolsa funcionou
@@ -53,13 +53,13 @@ dias = cursor.fetchall()
 # contador_dia = (contador_dia[0][0])
 
 # Select no banco que vai definir a quantidade de meses existentes no periodo selecionado
-cursor.execute('SELECT timestampdiff(MONTH,"' + dia_inicio + '", "' + dia_fim + '") from readCSV.IFIX;')
+cursor.execute('SELECT timestampdiff(MONTH,"' + dia_inicio + '", "' + dia_fim + '") from FUNDOS.IFIX;')
 meses = cursor.fetchall()
 meses = (meses[0][0])
 
 # Select do Dividend Yield mensal definido pelo dia_inicio e dia_fim
 cursor.execute(
-    'SELECT yield from dividend.' + cod_fii + ' WHERE mes >="' + dia_inicio + '" and mes <="' + dia_fim + '";')
+    'SELECT yield from DIVIDENDOS.' + cod_fii + ' WHERE mes >="' + dia_inicio + '" and mes <="' + dia_fim + '";')
 yieldList = cursor.fetchall()
 
 sumYield = 0
@@ -116,10 +116,10 @@ preco_medio = 0
 # sendo maior que 1 significa que o valor do dia mais atual é maior que o mais antigo e menor que o valor atual é
 # menor que o dia anterior
 for i in range(len(dias) - 1):
-    list_return_ifix.append(1 - (list_ifix[i] / list_ifix[i + 1]))
+    list_return_ifix.append((list_ifix[i] / list_ifix[i + 1])-1)
 
 for i in range(len(dias) - 1):
-    list_return_fii.append(1 - (list_fii[i] / list_fii[i + 1]))
+    list_return_fii.append((list_fii[i] / list_fii[i + 1])-1)
 
 # For que soma os valores diarios de fechamento para que futaramente possa ser dividido a fim de achar um preço medio
 for i in range(len(dias) - 1):
@@ -141,9 +141,13 @@ for x in list_return_ifix:
     media_return_ifix += x
 media_return_ifix = media_return_ifix / (len(list_return_ifix))
 
+print(media_return_ifix)
+
 for x in list_return_fii:
     media_return_fii += x
 media_return_fii = media_return_fii / (len(list_return_fii))
+
+print(media_return_fii)
 
 # Variaveis definidas para executar o calculo do Indice Beta
 COV = 0
@@ -199,8 +203,8 @@ rendimentos = float((sumYield/100)*preco_medio)
 print(f'No ato da compra geraria {cotas} cotas que renderam cada cota {rendimentos:0.2f}')
 print(f'Ou R${cotas*rendimentos:0.2f} no total')
 
-"""
-matt.plot(list_return_dia, list_return_ifix)
+
+"""matt.plot(list_return_dia, list_return_ifix)
 matt.plot(list_return_dia, list_return_fii, ':')
 matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
 matt.xlabel('Periodo')
@@ -209,7 +213,6 @@ matt.legend(['IFIX', cod_fii])
 matt.grid()
 matt.show()
 """
-
 x = nump.array(list_return_ifix)
 y = nump.array(list_return_fii)
 x = (nump.float_(x))

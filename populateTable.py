@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import connectionDatabase as Conn
 from createTable import criarTabela
 from decimal import Decimal
@@ -9,9 +10,10 @@ from decimal import Decimal
 database = Conn.connectionDB()
 
 # Variaveis que definem a localização do arquivo
+user = os.getlogin()
 
-path = 'C:/Users/vfonseca/Downloads/'
-name_file = 'BPFF11'
+path = f'C:/Users/{user}/Downloads/'
+name_file = 'BTLG11'
 type_file = 'csv'
 
 # Variavel que define o arquivo que será lido
@@ -31,7 +33,7 @@ criarTabela(name_file)
 
 # Função que limpa a tabela caso a tabela já exista e tenha conteudo
 # Essa limpeza é mais utilizada quando ocorre atualizações nos registros
-cursor.execute('TRUNCATE readCSV.' + name_file + ';')
+cursor.execute('TRUNCATE FUNDOS.' + name_file + ';')
 database.commit()
 
 
@@ -40,7 +42,7 @@ for num in range(df['Date'].size):
     dateFii = df['Date'][num]
     openFii = Decimal(df['Open'][num])
     closeFii = Decimal(df['Close'][num])
-    cursor.execute('INSERT into readCSV.'+name_file+' (dia, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
+    cursor.execute('INSERT into FUNDOS.'+name_file+' (dia, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
                                                                                                        openFii,
                                                                                                        closeFii))
     database.commit()

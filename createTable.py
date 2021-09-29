@@ -7,13 +7,16 @@ import connectionDatabase as Conn
 
 
 def criarTabela(nome):
-    # Metodo do arquivo connectionDatabase.py que serve para se conectar ao banco de dados MySql
+    # Metodo do arquivo connectionDatabase.py que serve para se conectar
+    # ao banco de dados MySql
     database = Conn.connectionDB()
 
     cursor = database.cursor()
 
+    cursor.execute("CREATE DATABASE IF NOT EXISTS FUNDOS;")
+
     # Função que cria uma tabela caso a mesma não exista
-    cursor.execute("CREATE TABLE IF NOT EXISTS " + nome + """(
+    cursor.execute("CREATE TABLE IF NOT EXISTS FUNDOS." + nome + """(
     id INT NOT NULL AUTO_INCREMENT,
     dia DATE NOT NULL,
     abertura DECIMAL(10,2) NOT NULL,
@@ -27,7 +30,9 @@ def criarTabelaDividendo(nome):
 
     cursor = database.cursor()
 
-    cursor.execute("CREATE TABLE IF NOT EXISTS dividend." + nome + """(
+    cursor.execute("CREATE DATABASE IF NOT EXISTS DIVIDENDOS;")
+
+    cursor.execute("CREATE TABLE IF NOT EXISTS DIVIDENDOS." + nome + """(
     id INT NOT NULL AUTO_INCREMENT,
     mes DATE NOT NULL,
     yield FLOAT NOT NULL,

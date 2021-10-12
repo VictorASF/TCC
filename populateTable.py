@@ -24,6 +24,7 @@ file = f'{path}{name_file}.{type_file}'
 
 df = pd.read_csv(file)
 
+
 # print(df[['Date', 'Open']].to_string(index=False))
 
 cursor = database.cursor()
@@ -43,8 +44,8 @@ for num in range(df['Date'].size):
     openFii = Decimal(df['Open'][num])
     closeFii = Decimal(df['Close'][num])
     cursor.execute('INSERT into FUNDOS.'+name_file+' (dia, abertura, fechamento) VALUES(%s,%s,%s)', (dateFii,
-                                                                                                       openFii,
-                                                                                                       closeFii))
+                                                                                                     openFii,
+                                                                                                     closeFii))
     database.commit()
 
 print('IHUUUUUU, importação na tabela '+name_file+' realizada com sucesso!')

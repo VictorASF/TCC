@@ -28,11 +28,11 @@ cod_fii = 'BTLG11'
 valor_investido = 10000
 
 # Variavel de dia inicial que vai determinar o inicio do periodo no banco de dados
-dia_inicio = '2017-01-01'
+dia_inicio = '2020-01-01'
 
 # Variavel do dia final que vai determinar o fim do periodo que deve ser buscado no banco
 dia_fim = '2021-09-06'
-#dia_fim = '2021-09-06'
+# dia_fim = '2021-09-06'
 
 # Select no banco para selecionar os valores de abertura do fundo nos dias indicados
 cursor.execute(
@@ -42,15 +42,6 @@ fii = cursor.fetchall()
 # Select no banco para selecionar o valor de fechamento do IFIX(benchmark) nos dias indicados
 cursor.execute('SELECT dia, fechamento from FUNDOS.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
 ifix = cursor.fetchall()
-
-# Select no banco para selecionar os dias que a bolsa funcionou
-cursor.execute('SELECT dia from FUNDOS.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
-dias = cursor.fetchall()
-
-# Select no banco para selecionar a quantidade de dias que a bolsa funcionou
-# cursor.execute('SELECT count(dia) from readCSV.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
-# contador_dia = cursor.fetchall()
-# contador_dia = (contador_dia[0][0])
 
 # Select no banco que vai definir a quantidade de meses existentes no periodo selecionado
 cursor.execute('SELECT timestampdiff(MONTH,"' + dia_inicio + '", "' + dia_fim + '") from FUNDOS.IFIX;')
@@ -76,21 +67,14 @@ for dia in ifix:
     dia_auxiliar.append(dia[0])
 
 # For que faz a comparação e exclusão de dias desnecessarios para não causar erro no calculo futuro
-for dia in fii:
-    if dia[0] not in dia_auxiliar:
-        fii.remove(dia)
+# for dia in fii:
+#    if dia[0] not in dia_auxiliar:
+#        fii.remove(dia)
 
 
 # Variaveis auxiliares para filtrar os valores que foram coletados do banco
-list_dia = []
 list_ifix = []
 list_fii = []
-
-# For utilizado para receber a data do pregão que foi removida do banco,
-# como a variavel dias é uma lista de tuplas com 2 valores cada é necessario filtrar só o primeiro valor
-# que é o valor que realmente interessa
-for dia in dias:
-    list_dia.append(dia[0])
 
 # Os 2 for abaixo são usados com a mesma finalidade pegar os valores de fechamento do IFIX e FII
 # (IFIX para o primeiro for, FII para o segundo for)
@@ -103,7 +87,7 @@ for x in fii:
 # posição 0 fique o valor mais recente e na posição x+1 vá ficando o valor mais antigo
 list_ifix.reverse()
 list_fii.reverse()
-list_dia.reverse()
+dia_auxiliar.reverse()
 
 # Variaveis de apoio que irão receber respectivamente o retorno do Benchmark, do Fundo
 # e a soma total do preço diario do fundo
@@ -115,21 +99,21 @@ preco_medio = 0
 # Os 2 For utilizados abaixo são para saber se a divisão do dia i com o dia anterior é maior ou menor que 1
 # sendo maior que 1 significa que o valor do dia mais atual é maior que o mais antigo e menor que o valor atual é
 # menor que o dia anterior
-for i in range(len(dias) - 1):
-    list_return_ifix.append((list_ifix[i] / list_ifix[i + 1])-1)
+for i in range(len(dia_auxiliar) - 1):
+    list_return_ifix.append(float((list_ifix[i] / list_ifix[i + 1])-1))
 
-for i in range(len(dias) - 1):
-    list_return_fii.append((list_fii[i] / list_fii[i + 1])-1)
+for i in range(len(dia_auxiliar) - 1):
+    list_return_fii.append(float((list_fii[i] / list_fii[i + 1])-1))
 
 # For que soma os valores diarios de fechamento para que futaramente possa ser dividido a fim de achar um preço medio
-for i in range(len(dias) - 1):
+for i in range(len(dia_auxiliar) - 1):
     preco_medio += list_fii[i]
 
-for i in range(len(dias) - 1):
-    list_return_dia.append(list_dia[i])
-
 # Variavel agora recebendo a divisão em float do total do preco_medio pelo quantidade de dias de pregão
-preco_medio = float(preco_medio/len(dias))
+preco_medio = float(preco_medio/len(dia_auxiliar))
+
+for i in range(len(dia_auxiliar) - 1):
+    list_return_dia.append(dia_auxiliar[i])
 
 # Variaveis que receberam a media dos retornos efetivos dos FII e o IFIX em valorização ou desvalorizção
 media_return_fii = 0
@@ -141,17 +125,9 @@ for x in list_return_ifix:
     media_return_ifix += x
 media_return_ifix = media_return_ifix / (len(list_return_ifix))
 
-print(media_return_ifix)
-
 for x in list_return_fii:
     media_return_fii += x
 media_return_fii = media_return_fii / (len(list_return_fii))
-
-print(media_return_fii)
-
-# Variaveis definidas para executar o calculo do Indice Beta
-COV = 0
-VAR = 0
 
 # Covariancia é um for que recebe como range o tamanho da lista que será executada, onde a Covariancia final é
 # o somatorio de todas essa operação e isso realiza
@@ -159,15 +135,22 @@ VAR = 0
 # e isso se multiplica pelo valor de retorno do benchmark subtraido da media de retorno desse benchmark
 # onde para que isso aconteça esses valores precisam ser do mesmo dia
 # ao fim do somatorio a covariancia total é dividida pelo tamanho da lista chegando assim ao resultado final
-for x in range(len(list_return_fii)):
-    COV += ((list_return_fii[x] - media_return_fii) * (list_return_ifix[x] - media_return_ifix))
-COV = COV / (len(list_return_fii))
+# for x in range(len(list_return_fii)):
+#    COV += ((list_return_fii[x] - media_return_fii) * (list_return_ifix[x] - media_return_ifix))
+# COV = COV / (len(list_return_fii))
+
+
+COV = nump.cov(list_return_ifix, list_return_fii)[0][1]
+
 
 # Variancia é um for que recebe o tamanho de uma lista como range e executa um somatorio da
 # subtração do retorno do benchmark ao quadrado e ao fim é executado a divisão da variancia somada com o resultado final
-for x in range(len(list_return_ifix)):
-    VAR += (list_return_ifix[x] - media_return_ifix) ** 2
-VAR = VAR / (len(list_return_ifix) - 1)
+# for x in range(len(list_return_ifix)):
+#    VAR += (list_return_ifix[x] - media_return_ifix) ** 2
+# VAR = VAR / (len(list_return_ifix))
+
+VAR = nump.var(list_return_ifix)
+
 
 # Calculo de Beta onde é Covariancia/Variancia
 Beta = float(COV / VAR)
@@ -204,7 +187,7 @@ print(f'No ato da compra geraria {cotas} cotas que renderam cada cota {rendiment
 print(f'Ou R${cotas*rendimentos:0.2f} no total')
 
 
-"""matt.plot(list_return_dia, list_return_ifix)
+matt.plot(list_return_dia, list_return_ifix)
 matt.plot(list_return_dia, list_return_fii, ':')
 matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
 matt.xlabel('Periodo')
@@ -212,20 +195,20 @@ matt.ylabel('Retorno (%)')
 matt.legend(['IFIX', cod_fii])
 matt.grid()
 matt.show()
-"""
+
 x = nump.array(list_return_ifix)
 y = nump.array(list_return_fii)
 x = (nump.float_(x))
 y = (nump.float_(y))
 
-matt.plot(x,y, 'o')
+matt.plot(x, y, 'o')
 
-m, b = nump.polyfit(x, y, 1)
+# m, b = nump.polyfit(x, y, 1)
 
-matt.plot(x, m*x + b)
+"""matt.plot(x, m*x + b)
 matt.title(f'Beta {cod_fii} periodo {dia_inicio} a {dia_fim}')
 matt.xlabel('IFIX')
 matt.ylabel(cod_fii)
 matt.grid()
 matt.show()
-
+"""

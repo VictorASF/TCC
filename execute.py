@@ -1,3 +1,5 @@
+import datetime
+
 import connectionDatabase as Conn
 from matplotlib import pyplot as matt
 import numpy as nump
@@ -9,30 +11,38 @@ database = Conn.connectionDB()
 cursor = database.cursor()
 
 # Variavel que recebe o fundo que será utilizado para efetuar os calculos
-cod_fii = 'BTLG11'
+cod_fii = 'BBPO11'
 
 # Opções de FII
 # BTLG11 Imovel Logistico
-# BRCR11 Lajes Corporativas
+# BRCR11 Lajes Corporativas - Diego - já analisado
 # HGBS11 Shoppings
 # HGLG11 Imovel Logisticos
 # HGRE11 Lajes Corporativas
-# KNRI11 Misto
-# MXRF11 Papéis
+# KNRI11 Misto - Diego - já analisado
+# MXRF11 Papéis - Diego - já analisado
 # VRTA11 Papéis
-# BBPO11 Agencias Bancarias
+# BBPO11 Agencias Bancarias - Diego -
 # MFII11 Fundo de Desenvolvimento
 # BPFF11 Fundo de Fundos
 
 # Variavel que é usada de exemplo para definir valores dos rendimentos
 valor_investido = 10000
 
-# Variavel de dia inicial que vai determinar o inicio do periodo no banco de dados
-dia_inicio = '2020-01-01'
+a = 1
 
+# Variavel de dia inicial que vai determinar o inicio do periodo no banco de dados
+dia_inicio='2017-01-01'
+# dia_inicio = '2020-01-01'
+format = "%Y-%m-%d"
+
+#if (datetime.datetime.strptime(dia_inicio, format)<datetime.datetime(2014,6,1)):
+#    print(datetime.datetime.strptime(dia_inicio, format))
+#else:
+#    exit(1)
 # Variavel do dia final que vai determinar o fim do periodo que deve ser buscado no banco
-dia_fim = '2021-09-06'
 # dia_fim = '2021-09-06'
+dia_fim = '2020-01-01'
 
 # Select no banco para selecionar os valores de abertura do fundo nos dias indicados
 cursor.execute(
@@ -58,6 +68,8 @@ sumYield = 0
 # For utilizado para fazer a soma do dividend yield antes numa lista em uma variavel tipo float
 for i in yieldList:
     sumYield += i[0]
+
+media_mensal = sumYield/meses
 
 # Variavel auxiliar para limpar qualquer dia incluso onde a bolsa não funcionou
 dia_auxiliar = []
@@ -155,60 +167,66 @@ VAR = nump.var(list_return_ifix)
 # Calculo de Beta onde é Covariancia/Variancia
 Beta = float(COV / VAR)
 
-print(f"Indice Beta {cod_fii}: {Beta:0.4f}")
-
 # Retorno calculo do retorno IFIX
-retorno_ifix = ((list_ifix[0] / list_ifix[len(list_ifix) - 1]) - 1)
+retorno_ifix = ((list_ifix[0] / list_ifix[-1]) - 1)
 
 # Retorno calculo de retorno FII onde o primeiro valor do FII é dividido pelo ultimo valor -1
 # e esse resultado é subtraido 1
 
-retorno_fii = ((list_fii[0] / list_fii[len(list_fii) - 1]) - 1)
+retorno_fii = ((list_fii[0] / list_fii[-1]) - 1)
 
 # CAPM
 
-returnFreeOfRisk = (5.25 / 100)
+returnFreeOfRisk = (4.50 / 100)
 
 returnBenchmark = float(retorno_ifix)
 
 returnExpected = returnFreeOfRisk + (Beta * (returnBenchmark - returnFreeOfRisk))
+print(f"Indice Beta {cod_fii}: {Beta:0.4f}")
 print(f'Retorno Esperado (CAPM) do FII {cod_fii}: {returnExpected * 100:05.2f}%')
 print(f'Retorno IFIX: {retorno_ifix * 100:05.2f}%')
 print(f'Retorno real do FII {cod_fii}: {retorno_fii * 100:05.2f}%')
+valor_valorizado = float(valor_investido + (retorno_fii * valor_investido))
 print(
-    f'Retorno sobre um investimento de R${valor_investido}: R${valor_investido + (retorno_fii * valor_investido):0.2f}')
+    f'Retorno sobre um investimento de R${valor_investido}: R${valor_valorizado:0.2f}')
 
 print(f'Retorno em redimentos {cod_fii} com o valor de R${valor_investido} investido:')
 
 # Dividendos
 cotas = float(valor_investido//list_fii[-1])
 rendimentos = float((sumYield/100)*preco_medio)
-print(f'No ato da compra geraria {cotas} cotas que renderam cada cota {rendimentos:0.2f}')
+print(f'No ato da compra geraria {cotas:0.0f} cotas que renderam cada cota R${rendimentos/meses:0.2f} durante cada mês')
+print(f'Durante um periodo de {meses} meses')
 print(f'Ou R${cotas*rendimentos:0.2f} no total')
+print(f'O que seria R${((cotas*rendimentos)/meses):0.2f} por mês')
+print(f'No total R${valor_valorizado + (cotas*rendimentos):0.2f}')
+print(f'Sendo uma valorização total de {(valor_valorizado+(cotas*rendimentos) - valor_investido)/valor_investido * 100:0.2f}%')
+print(f'Ou R${(valor_valorizado+(cotas*rendimentos) - valor_investido):0.2f}')
 
+if a == 1:
+    matt.plot(list_return_dia, list_return_ifix)
+    matt.plot(list_return_dia, list_return_fii, ':')
+    matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
+    matt.xlabel('Periodo')
+    matt.ylabel('Retorno (%)')
+    matt.legend(['IFIX', cod_fii])
+    matt.grid()
+    matt.show()
 
-matt.plot(list_return_dia, list_return_ifix)
-matt.plot(list_return_dia, list_return_fii, ':')
-matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
-matt.xlabel('Periodo')
-matt.ylabel('Retorno (%)')
-matt.legend(['IFIX', cod_fii])
-matt.grid()
-matt.show()
+elif a == 2:
+    x = nump.array(list_return_ifix)
+    y = nump.array(list_return_fii)
+    x = (nump.float_(x))
+    y = (nump.float_(y))
 
-x = nump.array(list_return_ifix)
-y = nump.array(list_return_fii)
-x = (nump.float_(x))
-y = (nump.float_(y))
+    matt.plot(x, y, 'o')
 
-matt.plot(x, y, 'o')
+    m, b = nump.polyfit(x, y, 1)
 
-# m, b = nump.polyfit(x, y, 1)
+    matt.plot(x, m*x + b)
+    matt.title(f'Beta {cod_fii} periodo {dia_inicio} a {dia_fim}')
+    matt.xlabel('IFIX')
+    matt.ylabel(cod_fii)
+    matt.grid()
+    matt.show()
 
-"""matt.plot(x, m*x + b)
-matt.title(f'Beta {cod_fii} periodo {dia_inicio} a {dia_fim}')
-matt.xlabel('IFIX')
-matt.ylabel(cod_fii)
-matt.grid()
-matt.show()
-"""

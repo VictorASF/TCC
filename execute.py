@@ -29,7 +29,7 @@ cod_fii = 'BBPO11'
 # Variavel que é usada de exemplo para definir valores dos rendimentos
 valor_investido = 10000
 
-a = 1
+grafico = 1
 
 # Variavel de dia inicial que vai determinar o inicio do periodo no banco de dados
 dia_inicio='2017-01-01'
@@ -203,7 +203,7 @@ print(f'No total R${valor_valorizado + (cotas*rendimentos):0.2f}')
 print(f'Sendo uma valorização total de {(valor_valorizado+(cotas*rendimentos) - valor_investido)/valor_investido * 100:0.2f}%')
 print(f'Ou R${(valor_valorizado+(cotas*rendimentos) - valor_investido):0.2f}')
 
-if a == 1:
+if grafico == 1:
     matt.plot(list_return_dia, list_return_ifix)
     matt.plot(list_return_dia, list_return_fii, ':')
     matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
@@ -213,7 +213,7 @@ if a == 1:
     matt.grid()
     matt.show()
 
-elif a == 2:
+elif grafico == 2:
     x = nump.array(list_return_ifix)
     y = nump.array(list_return_fii)
     x = (nump.float_(x))

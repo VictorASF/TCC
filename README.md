@@ -37,7 +37,7 @@ Após isso só executar o script "execute.py" e você obterá suas analises.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-                                                                  DISCLAIMER
+                                                DISCLAIMER
 
 Seguindo os principios do open scource este codigo pode ser modificado, reutilizado e aproveitado em diversos projetos sinta livre para utilizá-lo.
 

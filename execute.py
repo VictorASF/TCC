@@ -36,10 +36,6 @@ dia_inicio='2017-01-01'
 # dia_inicio = '2020-01-01'
 format = "%Y-%m-%d"
 
-#if (datetime.datetime.strptime(dia_inicio, format)<datetime.datetime(2014,6,1)):
-#    print(datetime.datetime.strptime(dia_inicio, format))
-#else:
-#    exit(1)
 # Variavel do dia final que vai determinar o fim do periodo que deve ser buscado no banco
 # dia_fim = '2021-09-06'
 dia_fim = '2020-01-01'
@@ -77,12 +73,6 @@ dia_auxiliar = []
 # For para atribuir o dia da lista
 for dia in ifix:
     dia_auxiliar.append(dia[0])
-
-# For que faz a comparação e exclusão de dias desnecessarios para não causar erro no calculo futuro
-# for dia in fii:
-#    if dia[0] not in dia_auxiliar:
-#        fii.remove(dia)
-
 
 # Variaveis auxiliares para filtrar os valores que foram coletados do banco
 list_ifix = []

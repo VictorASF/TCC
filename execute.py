@@ -1,44 +1,42 @@
-import datetime
-
 import connectionDatabase as Conn
 from matplotlib import pyplot as matt
 import numpy as nump
 
-# Variavel que gera a conexão com o banco de dados
+# Variável que gera a conexão com o banco de dados
 database = Conn.connectionDB()
 
-# Variavel usada para executar funções no banco como SELECT, TRUNCATE, DELETE
+# Variável usada para executar funções no banco como SELECT, TRUNCATE, DELETE
 cursor = database.cursor()
 
-# Variavel que recebe o fundo que será utilizado para efetuar os calculos
-cod_fii = 'BBPO11'
+# Variável que recebe o fundo que será utilizado para efetuar os cálculos
+cod_fii = 'BTLG11'
 
 # Opções de FII
-# BTLG11 Imovel Logistico
-# BRCR11 Lajes Corporativas - Diego - já analisado
+# BTLG11 Imóvel Logistico
+# BRCR11 Lajes Corporativas
 # HGBS11 Shoppings
 # HGLG11 Imovel Logisticos
 # HGRE11 Lajes Corporativas
-# KNRI11 Misto - Diego - já analisado
-# MXRF11 Papéis - Diego - já analisado
+# KNRI11 Misto
+# MXRF11 Papéis
 # VRTA11 Papéis
-# BBPO11 Agencias Bancarias - Diego -
+# BBPO11 Agências Bancárias
 # MFII11 Fundo de Desenvolvimento
 # BPFF11 Fundo de Fundos
 
-# Variavel que é usada de exemplo para definir valores dos rendimentos
-valor_investido = 10000
+# Variável que é usada de exemplo para definir valores dos rendimentos
+valor_investido = 100000
 
-grafico = 1
+grafico = 2
 
-# Variavel de dia inicial que vai determinar o inicio do periodo no banco de dados
-dia_inicio='2017-01-01'
+# Variavel de dia inicial que vai determinar o início do período no banco de dados
+dia_inicio = '2017-01-01'
 # dia_inicio = '2020-01-01'
 format = "%Y-%m-%d"
 
-# Variavel do dia final que vai determinar o fim do periodo que deve ser buscado no banco
+# Variavel do dia final que vai determinar o fim do período que deve ser buscado no banco
 # dia_fim = '2021-09-06'
-dia_fim = '2020-01-01'
+dia_fim = '2021-09-06'
 
 # Select no banco para selecionar os valores de abertura do fundo nos dias indicados
 cursor.execute(
@@ -49,7 +47,7 @@ fii = cursor.fetchall()
 cursor.execute('SELECT dia, fechamento from FUNDOS.IFIX WHERE dia >="' + dia_inicio + '" and dia <="' + dia_fim + '";')
 ifix = cursor.fetchall()
 
-# Select no banco que vai definir a quantidade de meses existentes no periodo selecionado
+# Select no banco que vai definir a quantidade de meses existentes no período selecionado
 cursor.execute('SELECT timestampdiff(MONTH,"' + dia_inicio + '", "' + dia_fim + '") from FUNDOS.IFIX;')
 meses = cursor.fetchall()
 meses = (meses[0][0])
@@ -61,20 +59,20 @@ yieldList = cursor.fetchall()
 
 sumYield = 0
 
-# For utilizado para fazer a soma do dividend yield antes numa lista em uma variavel tipo float
+# For utilizado para fazer a soma do dividend yield antes numa lista em uma variável tipo float
 for i in yieldList:
     sumYield += i[0]
 
 media_mensal = sumYield/meses
 
-# Variavel auxiliar para limpar qualquer dia incluso onde a bolsa não funcionou
+# Variável auxiliar para limpar qualquer dia incluso onde a bolsa não funcionou
 dia_auxiliar = []
 
 # For para atribuir o dia da lista
 for dia in ifix:
     dia_auxiliar.append(dia[0])
 
-# Variaveis auxiliares para filtrar os valores que foram coletados do banco
+# Variáveis auxiliares para filtrar os valores que foram coletados do banco
 list_ifix = []
 list_fii = []
 
@@ -91,8 +89,8 @@ list_ifix.reverse()
 list_fii.reverse()
 dia_auxiliar.reverse()
 
-# Variaveis de apoio que irão receber respectivamente o retorno do Benchmark, do Fundo
-# e a soma total do preço diario do fundo
+# Variáveis de apoio que irão receber respectivamente o retorno do Benchmark, do Fundo
+# e a soma total do preço diário do fundo
 list_return_ifix = []
 list_return_fii = []
 list_return_dia = []
@@ -107,7 +105,7 @@ for i in range(len(dia_auxiliar) - 1):
 for i in range(len(dia_auxiliar) - 1):
     list_return_fii.append(float((list_fii[i] / list_fii[i + 1])-1))
 
-# For que soma os valores diarios de fechamento para que futaramente possa ser dividido a fim de achar um preço medio
+# For que soma os valores diários de fechamento para que futuramente possa ser dividido a fim de achar um preço medio
 for i in range(len(dia_auxiliar) - 1):
     preco_medio += list_fii[i]
 
@@ -131,36 +129,33 @@ for x in list_return_fii:
     media_return_fii += x
 media_return_fii = media_return_fii / (len(list_return_fii))
 
-# Covariancia é um for que recebe como range o tamanho da lista que será executada, onde a Covariancia final é
-# o somatorio de todas essa operação e isso realiza
+# Covariância é um for que recebe como range o tamanho da lista que será executada, onde a Covariância final é
+# o somatório de toda essa operação e isso realiza
 # subtraindo do valor de retorno do ativo a ser analisado com a media de retorno desse valor
-# e isso se multiplica pelo valor de retorno do benchmark subtraido da media de retorno desse benchmark
+# e isso se multiplica pelo valor de retorno do benchmark subtraído da media de retorno desse benchmark
 # onde para que isso aconteça esses valores precisam ser do mesmo dia
-# ao fim do somatorio a covariancia total é dividida pelo tamanho da lista chegando assim ao resultado final
+# ao fim do somatório a covariancia total é dividida pelo tamanho da lista chegando assim ao resultado final
 # for x in range(len(list_return_fii)):
 #    COV += ((list_return_fii[x] - media_return_fii) * (list_return_ifix[x] - media_return_ifix))
 # COV = COV / (len(list_return_fii))
 
-
 COV = nump.cov(list_return_ifix, list_return_fii)[0][1]
 
-
-# Variancia é um for que recebe o tamanho de uma lista como range e executa um somatorio da
-# subtração do retorno do benchmark ao quadrado e ao fim é executado a divisão da variancia somada com o resultado final
+# Variância é um for que recebe o tamanho de uma lista como range e executa um somatorio da
+# subtração do retorno do benchmark ao quadrado e ao fim é executado a divisão da variância somada com o resultado final
 # for x in range(len(list_return_ifix)):
 #    VAR += (list_return_ifix[x] - media_return_ifix) ** 2
 # VAR = VAR / (len(list_return_ifix))
 
 VAR = nump.var(list_return_ifix)
 
-
-# Calculo de Beta onde é Covariancia/Variancia
+# Cálculo de Beta onde é Covariancia/Variância
 Beta = float(COV / VAR)
 
-# Retorno calculo do retorno IFIX
+# Retorno cálculo do retorno IFIX
 retorno_ifix = ((list_ifix[0] / list_ifix[-1]) - 1)
 
-# Retorno calculo de retorno FII onde o primeiro valor do FII é dividido pelo ultimo valor -1
+# Retorno cálculo de retorno FII onde o primeiro valor do FII é dividido pelo ultimo valor -1
 # e esse resultado é subtraido 1
 
 retorno_fii = ((list_fii[0] / list_fii[-1]) - 1)
@@ -172,16 +167,14 @@ returnFreeOfRisk = (4.50 / 100)
 returnBenchmark = float(retorno_ifix)
 
 returnExpected = returnFreeOfRisk + (Beta * (returnBenchmark - returnFreeOfRisk))
-print(f"Indice Beta {cod_fii}: {Beta:0.4f}")
-print(f'Retorno Esperado (CAPM) do FII {cod_fii}: {returnExpected * 100:05.2f}%')
+print(f"Índice Beta {cod_fii}: {Beta:0.4f}")
+print(f'Retorno esperado (CAPM) do FII {cod_fii}: {returnExpected * 100:05.2f}%')
 print(f'Retorno IFIX: {retorno_ifix * 100:05.2f}%')
 print(f'Retorno real do FII {cod_fii}: {retorno_fii * 100:05.2f}%')
 valor_valorizado = float(valor_investido + (retorno_fii * valor_investido))
 print(
     f'Retorno sobre um investimento de R${valor_investido}: R${valor_valorizado:0.2f}')
-
-print(f'Retorno em redimentos {cod_fii} com o valor de R${valor_investido} investido:')
-
+print(f'Retorno em rendimentos {cod_fii} com o valor de R${valor_investido} investido:')
 # Dividendos
 cotas = float(valor_investido//list_fii[-1])
 rendimentos = float((sumYield/100)*preco_medio)
@@ -196,7 +189,7 @@ print(f'Ou R${(valor_valorizado+(cotas*rendimentos) - valor_investido):0.2f}')
 if grafico == 1:
     matt.plot(list_return_dia, list_return_ifix)
     matt.plot(list_return_dia, list_return_fii, ':')
-    matt.title(f'Retorno Diario {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
+    matt.title(f'Retorno Diário {cod_fii} x IFIX periodo {dia_inicio} a {dia_fim}')
     matt.xlabel('Periodo')
     matt.ylabel('Retorno (%)')
     matt.legend(['IFIX', cod_fii])

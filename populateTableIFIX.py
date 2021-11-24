@@ -45,6 +45,5 @@ for num in range(df['Date'].size):
                                                                                                      closeFii))
     database.commit()
 
-print('IHUUUUUU, importação na tabela '+name_file+' realizada com sucesso!')
 
 

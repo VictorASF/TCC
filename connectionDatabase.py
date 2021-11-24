@@ -1,11 +1,13 @@
 import mysql.connector as my
 
-#Metodo que cria uma conexão com o banco de dados
+# Método que cria uma conexão com o banco de dados
+
+
 def connectionDB():
     database = my.connect(host='localhost',
-                        database='readCSV',
-                        user='root',
-                        password='root',
-                        port='3308')
+                          database='readCSV',
+                          user='root',
+                          password='root',
+                          port='3308')
 
     return database

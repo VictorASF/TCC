@@ -16,16 +16,11 @@ path = f'C:/Users/{user}/Downloads/'
 name_file = 'BTLG11'
 type_file = 'csv'
 
-# Variavel que define o arquivo que será lido
-
+# Variável que define o arquivo que será lido
 file = f'{path}{name_file}.{type_file}'
 
-# Variavel que recebe a saida de uma função Pandas que lê o CSV
-
+# Variável que recebe a saida de uma função Pandas que lê o CSV
 df = pd.read_csv(file)
-
-
-# print(df[['Date', 'Open']].to_string(index=False))
 
 cursor = database.cursor()
 
@@ -47,6 +42,4 @@ for num in range(df['Date'].size):
                                                                                                      openFii,
                                                                                                      closeFii))
     database.commit()
-
-print('IHUUUUUU, importação na tabela '+name_file+' realizada com sucesso!')
 
